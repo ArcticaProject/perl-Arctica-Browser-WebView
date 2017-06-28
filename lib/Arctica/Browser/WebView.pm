@@ -61,7 +61,7 @@ package Arctica::Browser::WebView;
 use strict;
 use Gtk3;
 use Glib 'TRUE', 'FALSE';
-use Gtk3::WebKit;
+use Gtk3::WebKit2;
 use Data::Dumper;
 # Be very selective about what (if any) gets exported by default:
 our @EXPORT = qw();
@@ -110,8 +110,9 @@ sub _gen_webview_main {
 
 	$self->{'_gtk'}{'webview'}{'main_container'} = Gtk3::Overlay->new();
 
-	$self->{'_gtk'}{'webview'}{'thewebview'} = Gtk3::WebKit::WebView->new();
+	$self->{'_gtk'}{'webview'}{'thewebview'} = Gtk3::WebKit2::WebView->new();
 	$self->{'_gtk'}{'webview'}{'thewebview'}->load_uri("http://duckduckgo.com/");#
+
 	$self->{'_gtk'}{'webview'}{'scroller'} = Gtk3::ScrolledWindow->new();
 	$self->{'_gtk'}{'webview'}{'scroller'}->add($self->{'_gtk'}{'webview'}{'thewebview'});
 	$self->{'_gtk'}{'webview'}{'main_container'}->add($self->{'_gtk'}{'webview'}{'scroller'});
@@ -119,13 +120,29 @@ sub _gen_webview_main {
 	$self->{'_gtk'}{'webview'}{'bottom_overlay_text'} = Gtk3::Label->new();
 	$self->{'_gtk'}{'webview'}{'bottom_overlay_text'}->set_halign('start');
 	$self->{'_gtk'}{'webview'}{'bottom_overlay_text'}->set_valign('end');
+	$self->{'_gtk'}{'webview'}{'bottom_overlay_text'}->override_background_color('normal',Gtk3::Gdk::RGBA->new(0.6, 0.6, 0.6, 0.6,));
 	$self->{'_gtk'}{'webview'}{'main_container'}->add_overlay($self->{'_gtk'}{'webview'}{'bottom_overlay_text'});
 
 
-	$self->{'_gtk'}{'webview'}{'thewebview'}->signal_connect( 'hovering-over-link' => sub {$self->_sigfunc_webview_hover_over_link($_[2]);}, undef );
-	$self->{'_gtk'}{'webview'}{'thewebview'}->signal_connect( 'notify::load-status' => sub {$self->_sigfunc_webview_notify_load_status;}, undef );
-	$self->{'_gtk'}{'webview'}{'thewebview'}->signal_connect( 'notify::progress' => sub {$self->_sigfunc_webview_notify_progress;}, undef );
+	$self->{'_gtk'}{'webview'}{'thewebview'}->signal_connect( 'mouse-target-changed' => sub {$self->_sigfunc_webview_mouse_target($_[1]);});
+	$self->{'_gtk'}{'webview'}{'thewebview'}->signal_connect( 'load-changed' => sub {$self->_sigfunc_webview_notify_load_status($_[1])});
+#	$self->{'_gtk'}{'webview'}{'thewebview'}->signal_connect( 'notify::progress' => sub {$self->_sigfunc_webview_notify_progress;});# FIXME?
 #	$self->{'_gtk'}{'webview'}{'thewebview'}->signal_connect( 'notify::title' => sub {} , undef );
+	$self->{'_gtk'}{'webview'}{'thewebview'}->signal_connect( 'enter-fullscreen' => sub {return 1;} );# blocking fullscreen event before we fail....
+
+	my $settings = $self->{'_gtk'}{'webview'}{'thewebview'}->get_settings();
+
+
+#########################################################
+# FIXME: Default to uber strict settings... and load all settings from config file or service.
+	$settings->set_property("user-agent", 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:54.0) Gecko/20100101 Firefox/54.0');
+	$settings->set_property("enable-webgl", 1);
+	$settings->set_property("enable-webaudio", 1);
+	$settings->set_property("enable-plugins", 1);
+	$settings->set_property("enable_media_stream", 1);
+	$settings->set_property("enable_javascript", 1);
+#
+#########################################################
 
 }
 
@@ -150,7 +167,7 @@ sub ext_sigfunc {
 
 sub _sigfunc_webview_notify_load_status {
 	my $self = $_[0];
-	my $status = $self->{'_gtk'}{'webview'}{'thewebview'}->get('load_status');
+	my $status = $_[1];
 	if ($status eq 'committed') {
 		my $uri = $self->{'_gtk'}{'webview'}{'thewebview'}->get_uri();
 #		if ($uri) {print "URI:\t$uri\n";}
@@ -171,13 +188,19 @@ sub _sigfunc_webview_notify_progress {
 	}
 }
 
-sub _sigfunc_webview_hover_over_link {
+sub _sigfunc_webview_mouse_target {
+# FIXME: Do stuff for other context results too....?
 	my $self = $_[0];
-	my $link = $_[1];
-	if ($link) {
-		$self->{'_gtk'}{'webview'}{'bottom_overlay_text'}->set_text($link);
+	my $result = $_[1];
+
+
+	if ($result->context_is_link()) {
+		$self->{'_gtk'}{'webview'}{'bottom_overlay_text'}->set_text($result->get_link_uri());
+		$self->{'_gtk'}{'webview'}{'bottom_overlay_text'}->show();
 	} else {
+		$self->{'_gtk'}{'webview'}{'bottom_overlay_text'}->hide();
 		$self->{'_gtk'}{'webview'}{'bottom_overlay_text'}->set_text('');
+
 	}
 }
 
