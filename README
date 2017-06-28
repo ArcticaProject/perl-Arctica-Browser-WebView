@@ -1,8 +1,8 @@
 NAME
-    Arctica::Browser::Overlay - Core Perl modules for the Arctica Framework
+    Arctica::Browser::WebView - Core Perl modules for the Arctica Web Browser
 
 SYNOPSIS
-      use Arctica::Browser::Overlay;
+      use Arctica::Browser::WebView;
 
       <usage-example-code>
 
@@ -14,10 +14,10 @@ DESCRIPTION
 
     <Some overall explanation>
 
-    $Arctica::Browser::Overlay::<var1>
+    $Arctica::Browser::WebView::<var1>
         <Explanation on var1>.
 
-    $Arctica::Browser::Overlay::<var2>
+    $Arctica::Browser::WebView::<var2>
         <Explanation on var2>.
 
   Class Methods
@@ -47,7 +47,9 @@ DESCRIPTION
         Explanation on this...
 
 SEE ALSO
-    Arctica::Telekinesis::Server, Arctica::Telekinesis::Client, perl
+    Arctica::Telekinesis::Server, Arctica::Telekinesis::Client,
+    Arctica::Browser::Core, Arctica::Browser::Proxy, Arctica::Browser::ToolBar,
+    perl
 
 AUTHOR
     AUTHOR_FULLNAME <AUTHOR_MAILADDRESS>
