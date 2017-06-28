@@ -1,6 +1,21 @@
-2017-06-28 12:13:45 +0200 Mike Gabriel (aad7221)
+2017-06-28 15:29:57 +0200 Mike Gabriel (ed6a72c)
 
-	* release 0.0.0.1 (HEAD -> master)
+	* release 0.0.0.2 (HEAD -> master)
+
+2017-06-28 15:10:13 +0200 GZNGET FOSS Team (3eeb72a)
+
+	* Arctica::Browser::WebView: Switch over to using WebKit2.
+          (origin/master, gh-arctica/master)
+
+2017-06-28 14:15:44 +0200 Mike Gabriel (4e71c54)
+
+	* README: Fix copy+paste flaw originating from how we derived this
+          project from former perl-Arctica-Browser-Overlay.
+
+2017-06-28 12:13:45 +0200 Mike Gabriel (129e365)
+
+	* release 0.0.0.1 (tag: 0.0.0.1, gh-arctica/release-builds,
+          release-builds)
 
 2017-06-28 12:13:16 +0200 Mike Gabriel (a17e9ed)
 
